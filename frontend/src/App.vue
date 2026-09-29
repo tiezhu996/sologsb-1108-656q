@@ -3,6 +3,8 @@ import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDeveloperStore } from './stores/developerStore'
 import { useFilmStore } from './stores/filmStore'
+import { useStockStore } from './stores/stockStore'
+import { usePreparationStore } from './stores/preparationStore'
 import { useRecipeStore } from './stores/recipeStore'
 import { useRunStore } from './stores/runStore'
 import { downloadJson } from './utils/export'
@@ -10,6 +12,8 @@ import { downloadJson } from './utils/export'
 const route = useRoute()
 const filmStore = useFilmStore()
 const developerStore = useDeveloperStore()
+const stockStore = useStockStore()
+const preparationStore = usePreparationStore()
 const recipeStore = useRecipeStore()
 const runStore = useRunStore()
 
@@ -28,9 +32,11 @@ function isActive(path: string): boolean {
 function exportAll(): void {
   downloadJson(`gbfilmdev-backup-${new Date().toISOString().slice(0, 10)}.json`, {
     exportedAt: new Date().toISOString(),
-    schemaRev: 2,
+    schemaRev: 3,
     films: filmStore.films,
     developers: developerStore.developers,
+    stockSolutions: stockStore.stocks,
+    preparations: preparationStore.preparations,
     recipes: recipeStore.recipes,
     runs: runStore.runs
   })
@@ -40,6 +46,8 @@ onMounted(async () => {
   await Promise.all([
     filmStore.load(),
     developerStore.load(),
+    stockStore.load(),
+    preparationStore.load(),
     recipeStore.load(),
     runStore.load()
   ])

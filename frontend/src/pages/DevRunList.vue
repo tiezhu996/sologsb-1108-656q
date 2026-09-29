@@ -115,6 +115,7 @@ async function submitRun(): Promise<void> {
   const selectedDeveloper = developerStore.developers.find((item) => item.id === selectedRecipe.value?.developerId)
   const willExceedLimit = selectedDeveloper !== undefined
     && selectedDeveloper.state !== '报废'
+    && selectedDeveloper.state !== '已撤销'
     && selectedDeveloper.usedRolls + 1 > selectedDeveloper.maxRolls
   try {
     await runStore.addRun({

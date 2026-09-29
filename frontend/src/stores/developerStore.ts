@@ -3,15 +3,15 @@ import { db, plain } from '../utils/db'
 import type { Developer } from '../types/developer'
 import { remainingRolls } from '../utils/ratio'
 
-type NewDeveloper = Omit<Developer, 'id' | 'schemaRev'>
-
 export const useDeveloperStore = defineStore('developer', {
   state: () => ({
     developers: [] as Developer[],
     loading: false
   }),
   getters: {
-    activeDevelopers: (state) => state.developers.filter((developer) => developer.state !== '报废'),
+    activeDevelopers: (state) => state.developers.filter(
+      (developer) => developer.state !== '报废' && developer.state !== '已撤销'
+    ),
     availableRolls(): number {
       return this.activeDevelopers.reduce(
         (sum, developer) => sum + remainingRolls(developer.maxRolls, developer.usedRolls),
@@ -27,12 +27,6 @@ export const useDeveloperStore = defineStore('developer', {
       } finally {
         this.loading = false
       }
-    },
-    async addDeveloper(payload: NewDeveloper): Promise<number> {
-      const next = { ...payload, schemaRev: 2 }
-      const id = await db.developers.add(plain(next))
-      await this.load()
-      return id
     },
     async incrementUsed(id: number): Promise<void> {
       const developer = await db.developers.get(id)

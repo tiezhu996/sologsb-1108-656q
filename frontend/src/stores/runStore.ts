@@ -29,7 +29,7 @@ export const useRunStore = defineStore('run', {
       const recipe = await db.recipes.get(payload.recipeId)
       if (recipe) {
         const developer = await db.developers.get(recipe.developerId)
-        if (developer && developer.id !== undefined && developer.state !== '报废') {
+        if (developer && developer.id !== undefined && developer.state !== '报废' && developer.state !== '已撤销') {
           await db.developers.update(developer.id, plain({ usedRolls: developer.usedRolls + 1 }))
         }
       }
