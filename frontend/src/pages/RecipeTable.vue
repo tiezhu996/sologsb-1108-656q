@@ -9,7 +9,7 @@ import { useRecipeFilter } from '../hooks/useRecipeFilter'
 import { useDeveloperStore } from '../stores/developerStore'
 import { useFilmStore } from '../stores/filmStore'
 import { useRecipeStore } from '../stores/recipeStore'
-import type { Developer, Dilution } from '../types/developer'
+import type { Dilution } from '../types/developer'
 import type { DevRecipe, PushPull } from '../types/dev-recipe'
 
 interface RecipeForm {
@@ -130,7 +130,7 @@ async function submitRecipe(): Promise<void> {
 onMounted(async () => {
   await Promise.all([filmStore.load(), developerStore.load(), recipeStore.load()])
   if (filmStore.films[0]?.id !== undefined) form.filmId = filmStore.films[0].id
-  const usableDeveloper = developerStore.developers.find((item: Developer) => item.state !== '报废')
+  const usableDeveloper = developerStore.activeDevelopers[0]
   if (usableDeveloper?.id !== undefined) form.developerId = usableDeveloper.id
 })
 </script>
@@ -167,7 +167,7 @@ onMounted(async () => {
         <label class="span-2">
           <span>显影液</span>
           <select v-model.number="form.developerId" data-testid="field-developerId">
-            <option v-for="developer in developerStore.developers" :key="developer.id" :value="developer.id">
+            <option v-for="developer in developerStore.activeDevelopers" :key="developer.id" :value="developer.id">
               {{ developerLabel(developer.id ?? 0) }}
             </option>
           </select>

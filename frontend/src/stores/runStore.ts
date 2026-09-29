@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { db, plain } from '../utils/db'
+import { db, plain, SCHEMA_REV } from '../utils/db'
 import type { DevRun } from '../types/dev-run'
 
 type NewRun = Omit<DevRun, 'id' | 'schemaRev'>
@@ -24,12 +24,17 @@ export const useRunStore = defineStore('run', {
       }
     },
     async addRun(payload: NewRun): Promise<number> {
-      const next = { ...payload, schemaRev: 2 }
+      const next = { ...payload, schemaRev: SCHEMA_REV }
       const id = await db.runs.add(plain(next))
       const recipe = await db.recipes.get(payload.recipeId)
       if (recipe) {
         const developer = await db.developers.get(recipe.developerId)
-        if (developer && developer.id !== undefined && developer.state !== '报废') {
+        if (
+          developer
+          && developer.id !== undefined
+          && developer.state !== '报废'
+          && developer.state !== '已撤销'
+        ) {
           await db.developers.update(developer.id, plain({ usedRolls: developer.usedRolls + 1 }))
         }
       }
